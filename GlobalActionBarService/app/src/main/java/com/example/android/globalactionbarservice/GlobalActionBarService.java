@@ -28,6 +28,10 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -62,12 +66,31 @@ public class GlobalActionBarService extends AccessibilityService {
         swipeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Path swipePath = new Path();
-                swipePath.moveTo(1000, 1000);
-                swipePath.lineTo(100, 1000);
-                GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
-                gestureBuilder.addStroke(new GestureDescription.StrokeDescription(swipePath, 0, 500));
-                dispatchGesture(gestureBuilder.build(), null, null);
+
+                Process process = null;
+                try {
+//                    Process proc = Runtime.getRuntime().exec(new String[] { "su", "-c", "input keyevent 4"});
+//                    proc.waitFor();
+                    process = Runtime.getRuntime().exec("input swipe 100 100 300 300 100");
+                    System.out.println("input swipe 100 100 300 300 100");
+                    BufferedInputStream bufferedReader = new BufferedInputStream(
+                            process.getInputStream());
+                    int read = 0;
+                    byte[] output = new byte[1024];
+                    while ((read = bufferedReader.read(output)) != -1) {
+                        System.out.println(output[read]);
+                    }
+                } catch (IOException e) {
+                    System.out.println("EXCEPT");
+                    throw new RuntimeException(e);
+                }
+
+//                Path swipePath = new Path();
+//                swipePath.moveTo(1000, 1000);
+//                swipePath.lineTo(100, 1000);
+//                GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
+//                gestureBuilder.addStroke(new GestureDescription.StrokeDescription(swipePath, 0, 500));
+//                dispatchGesture(gestureBuilder.build(), null, null);
 
             }
         });
